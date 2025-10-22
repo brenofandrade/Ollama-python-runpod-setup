@@ -1,25 +1,16 @@
 #!/bin/bash
 set -euo pipefail
+echo "[post_start] $(date) - Pós-inicialização: preparando modelos..."
 
-echo "=== Pós-inicialização do ambiente Ollama ==="
-
-# Opcional: exibir versão
-ollama --version || true
-
-# Garante diretório de modelos
 mkdir -p /workspace/models
 
-# Opcional: pré-baixar modelos definidos em OLLAMA_PULL_MODELS (se houver)
-# Exemplo: OLLAMA_PULL_MODELS="llama3.1 qwen2.5"
 if [[ -n "${OLLAMA_PULL_MODELS:-}" ]]; then
-  echo "Pré-baixando modelos: $OLLAMA_PULL_MODELS"
+  echo "[post_start] Baixando modelos: $OLLAMA_PULL_MODELS"
   for model in $OLLAMA_PULL_MODELS; do
-    echo "Baixando modelo: $model"
-    if ! ollama pull "$model"; then
-      echo "Aviso: falha ao puxar $model; continuando."
-    fi
+    ollama pull "$model" || echo "Falha ao puxar $model (ignorando)"
   done
+else
+  echo "[post_start] Nenhum modelo definido em OLLAMA_PULL_MODELS"
 fi
 
-echo "post_start.sh concluído."
-
+echo "[post_start] Concluído."
